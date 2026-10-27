@@ -94,9 +94,10 @@ def summarize_ru(entry: dict) -> tuple[str, str] | None:
     prompt = (
         "Перескажи новость для Telegram-канала об индустрии гемблинга. "
         "Пиши по-русски, нейтрально и своими словами, без рекламы казино и призывов играть. "
+        "Не упоминай издание-источник, не вставляй ссылки и не цитируй текст дословно. "
         "Ответь строго в формате JSON: {\"title\": \"короткий заголовок\", "
         "\"text\": \"2–3 предложения сути\"}.\n\n"
-        f"Заголовок: {entry['title']}\nОписание: {entry['summary']}\nИсточник: {entry['source']}"
+        f"Заголовок: {entry['title']}\nОписание: {entry['summary']}"
     )
     try:
         r = requests.post(
@@ -129,7 +130,6 @@ def format_post(entry: dict) -> str:
     parts = [f"<b>{esc(title)}</b>"]
     if text:
         parts.append(esc(text))
-    parts.append(f'<a href="{esc(entry["link"], quote=True)}">Источник: {esc(entry["source"])}</a>')
     return "\n\n".join(parts)
 
 
@@ -142,7 +142,7 @@ def send_to_telegram(message: str) -> None:
             "chat_id": chat_id,
             "text": message,
             "parse_mode": "HTML",
-            "disable_web_page_preview": False,
+            "disable_web_page_preview": True,
         },
         timeout=30,
     )
